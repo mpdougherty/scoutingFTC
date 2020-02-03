@@ -1,0 +1,80 @@
+---
+title: "Scouting FTC"
+output: html_document
+---
+
+```{r }
+library(httr)
+library(jsonlite)
+```
+
+```{r}
+key <- "866c7381ce198b982998a767d6fb1f4c957518dd1548c5934e21f733bf785f9b"
+app <- "RoboMinionsScouting"
+season_key <- "1920"
+region_key <- "IA"
+league_key <- "1920-IA-CORE"
+team_key <- "11142"
+```
+
+```{r}
+toa_get <- function(endpoint, query_list, key, app) {
+  base <- "https://theorangealliance.org"
+  req <- httr::GET(url = paste0(base, endpoint),
+                   query = query_list,
+                   add_headers("X-TOA-Key" = key,
+                               "X-Application-Origin" = app,
+                               "Content-Type" = "application/json"))
+  message(paste("url:", req[1]))
+  # message(paste("status code:", req[2]))
+  # message(paste(req$headers$`content-type`))
+  content <- httr::content(req, as = "text", encoding="UTF-8")
+  df <- jsonlite::fromJSON(content)
+}
+```
+
+```{r}
+seasons <- toa_get("/api/seasons", list(), key, app)
+```
+
+```{r}
+regions <- toa_get("/api/regions", list(), key, app)
+```
+
+```{r}
+query_list <- list("region_key" = region_key, 
+                   "season_key" = season_key)
+leagues_IA_1920 <- toa_get("/api/leagues", query_list, key, app)
+```
+
+
+```{r}
+query_list <- list("region_key" = region_key, 
+                   "last_active" = season_key)
+teams_IA_1920 <- toa_get("/api/team", query_list, key, app)
+```
+
+```{r}
+query_list <- list("region_key" = region_key, 
+                   "season_key" = season_key)
+events_IA_1920 <- toa_get("/api/event", query_list, key, app)
+```
+
+```{r}
+tourn_match_details <- toa_get("/api/event/1920-IA-LT8/matches/details",
+                                     list(), key, app)
+```
+
+```{r}
+match_info <- toa_get("/api/match/1920-IA-LT8-E001-1", list(), key, app)
+```
+
+
+```{r}
+t11142_awards <- toa_get("/api/team/11142/awards/1920", list(), key, app) 
+```
+
+```{r}
+t11142_events <- toa_get("/api/team/11142/events/1920", list(), key, app)
+```
+
